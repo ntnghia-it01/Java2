@@ -149,7 +149,7 @@ public class StudentDAO {
     public boolean updateStudent(Student student){
         Connection conn = DatabaseConnect.connection();
         try{
-            String update = "UPDATE FROM students SET full_name=?, address=?,"
+            String update = "UPDATE students SET full_name=?, address=?,"
                     + " phone=?, lab_score=?, quiz_score=?, assignment_score=?,"
                     + " final_exam_score=?, average_score=?, status=? WHERE id=?";
             

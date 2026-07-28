@@ -51,9 +51,11 @@ public class Main {
                     break;
                 case 3:
                     System.out.println("3. Cập nhật sinh viên");
+                    updateStudent();
                     break;
                 case 4:
                     System.out.println("4. Xóa sinh viên");
+                    deleteStudent();
                     break;
                 case 5:
                     System.out.println("5. Tìm kiếm sinh viên");
@@ -158,6 +160,85 @@ public class Main {
         }else{
             System.out.printf("Thêm SV với MSSV là %s thất bại!\n", studentInput.getStudentCode());
         }   
+    }
+    
+//  Cập nhật sinh viên
+//  Cho người dùng nhập MSSV muốn cập nhật
+//  Nếu MSSV không tồn tại => Thông báo lỗi
+//  Nếu MSSV tồn tại 
+//    => Sẽ cho cập nhật các thông tin cơ bản của SV trừ MSSV
+    private static void updateStudent(){
+        StudentDAO studentDAO = new StudentDAO();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Nhập MSSV muốn cập nhật: ");
+        String studentCode = scanner.nextLine();
+//      Lấy thông tin SV từ MSSV
+//      Nếu SV này tồn tại => Cập nhật tiếp
+//      Nếu không tồn tại => Thông báo lỗi
+        Student student = studentDAO.getByStudentCode(studentCode);
+        if(student == null){
+            System.out.print("MSSV không tồn tại");
+            return;
+        }
+        System.out.print("Đã tìm thấy SV vui lòng cập nhật các thông tin:\n");
+        
+        String name = enterText("Nhập họ tên: ", "Họ tên không được để trống. Nhập lại!");
+        student.setFullName(name);
+        
+        String address = enterText("Nhập địa chỉ: ", "Địa chỉ không được để trống. Nhập lại!");
+        student.setAddress(address);
+        
+        String phone = enterPhoneNumber();
+        student.setPhone(phone);
+        
+        float labScore = enterScore("Nhập điểm bài Lab: ");
+        student.setLabScore(labScore);
+        
+        float quizScore = enterScore("Nhập đểm bài Quiz: ");
+        student.setQuizScore(quizScore);
+        
+        float assignmentScore = enterScore("Nhập điểm bài Assignment: ");
+        student.setAssignmentScore(assignmentScore);
+        
+        float finalScore = enterScore("Nhập điểm cuối môn: ");
+        student.setFinalExamScore(finalScore);
+        
+        //  Điểm TB thì tính theo trọng số 15, 5, 30, 50
+        double averageScore = student.getLabScore() * 0.15 
+                + student.getQuizScore() * 0.05 
+                + student.getAssignmentScore() * 0.3
+                + student.getFinalExamScore() * 0.5;
+        
+        student.setAverageScore((float) averageScore);
+        student.setStatus(averageScore >= 5 ? "PASS" : "FAIL");
+        
+        boolean update = studentDAO.updateStudent(student);
+        if(update){
+            System.out.printf("Cập nhật SV với MSSV là %s thành công!\n", student.getStudentCode());
+        }else{
+            System.out.printf("Cập nhật SV với MSSV là %s thất bại!\n", student.getStudentCode());
+        }
+    }
+    
+    private static void deleteStudent(){
+        StudentDAO studentDAO = new StudentDAO();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Nhập MSSV muốn xoá: ");
+        String studentCode = scanner.nextLine();
+//      Lấy thông tin SV từ MSSV
+//      Nếu SV này tồn tại => Cập nhật tiếp
+//      Nếu không tồn tại => Thông báo lỗi
+        Student student = studentDAO.getByStudentCode(studentCode);
+        if(student == null){
+            System.out.print("MSSV không tồn tại");
+            return;
+        }
+        boolean delete = studentDAO.deleteStudent(student.getId());
+        if(delete){
+            System.out.printf("Xoá SV với MSSV là %s thành công!\n", student.getStudentCode());
+        }else{
+            System.out.printf("Xoá SV với MSSV là %s thất bại!\n", student.getStudentCode());
+        }
     }
     
 //  Hàm này sẽ cho người dùng nhập 1 đoạn nội dung
