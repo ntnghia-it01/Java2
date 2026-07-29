@@ -4,11 +4,9 @@
 
 package com.fpoly.java2;
 
-import com.fpoly.java2.config.DatabaseConnect;
 import com.fpoly.java2.dao.StudentDAO;
+import com.fpoly.java2.models.Statistical;
 import com.fpoly.java2.models.Student;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -59,15 +57,19 @@ public class Main {
                     break;
                 case 5:
                     System.out.println("5. Tìm kiếm sinh viên");
+                    searchStudent();
                     break;
                 case 6:
                     System.out.println("6. Lọc theo trạng thái");
+                    filterStatus();
                     break;
                 case 7:
                     System.out.println("7. Sắp xếp danh sách");
+                    sortStudent();
                     break;
                 case 8:
                     System.out.println("8. Thống kê lớp học");
+                    statisticalStudent();
                     break;
                 case 9:
                     System.out.println("9. Thoát chương trình");
@@ -239,6 +241,171 @@ public class Main {
         }else{
             System.out.printf("Xoá SV với MSSV là %s thất bại!\n", student.getStudentCode());
         }
+    }
+    
+    public static void searchStudent(){
+        try{
+            StudentDAO studentDAO = new StudentDAO();
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("1. Tìm kiếm theo MSSV.");
+            System.out.println("2. Tìm kiếm theo họ và tên.");
+            
+            System.out.print("Chọn chức năng mà bạn muốn tìm (1 hoặc 2): ");
+            int choose = scanner.nextInt();
+            scanner.nextLine();
+            
+            switch(choose){
+                case 1:{
+                    System.out.print("Nhập MSSV: ");
+                    String studentCode = scanner.nextLine();
+                    Student student = studentDAO.getByStudentCode(studentCode);
+                    if(student != null){
+                        showStudentDetail(student);
+                    }else{
+                        System.out.println("Không tìm thấy SV!");
+                    }
+                    break;
+                }
+                case 2:{
+                    System.out.print("Nhập họ và tên: ");
+                    String studentName = scanner.nextLine();
+//                  Ở DAO xây dựng hàm này là tìm theo từ
+                    List<Student> students = studentDAO.getStudentByName(studentName);
+                    
+                    System.out.printf("Danh sách SV tìm được có %d bạn\n", students.size());
+                    
+                    for(Student student : students){
+                        System.out.printf("-----------------------------\n");
+                        showStudentDetail(student);
+                    }
+                    break;
+                }
+                default:
+                    System.out.println("Chọn sai thông tin!");
+                    break;
+            }
+        }catch(Exception e){
+            
+        }
+    }
+    
+    public static void filterStatus(){
+        try{
+            StudentDAO studentDAO = new StudentDAO();
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("1. Danh sách SV đạt.");
+            System.out.println("2. Danh sách SV không đạt.");
+            
+            System.out.print("Chọn danh sách bạn muốn xem (1 hoặc 2): ");
+            int choose = scanner.nextInt();
+            scanner.nextLine();
+            switch(choose){
+                case 1:{
+                    List<Student> students = studentDAO.getStudentByStatus(true);
+                    
+                    System.out.printf("Danh sách SV đạt có %d bạn\n", students.size());
+                    
+                    for(Student student : students){
+                        System.out.printf("-----------------------------\n");
+                        showStudentDetail(student);
+                    }
+                    break;
+                }
+                case 2:{
+                    List<Student> students = studentDAO.getStudentByStatus(false);
+                    
+                    System.out.printf("Danh sách SV không đạt có %d bạn\n", students.size());
+                    
+                    for(Student student : students){
+                        System.out.printf("-----------------------------\n");
+                        showStudentDetail(student);
+                    }
+                    break;
+                }
+                default:
+                    System.out.println("Chọn sai thông tin!");
+                    break;
+            }
+        }catch(Exception e){
+            
+        }
+    }
+    
+    public static void sortStudent(){
+        try{
+            StudentDAO studentDAO = new StudentDAO();
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("1. Sắp xếp theo điểm giảm dần.");
+            System.out.println("2. Sắp xếp theo điểm tăng dần.");
+            System.out.println("3. Sắp xếp theo họ và tên giảm dần.");
+            System.out.println("4. Sắp xếp theo họ và tên tăng dần.");
+            int choose = scanner.nextInt();
+            scanner.nextLine();
+            switch(choose){
+                case 1:{
+                    List<Student> students = studentDAO.getListSortByAvgScore(false);
+                    
+                    System.out.printf("Danh sách SV sắp xếp điểm giảm dần có %d bạn\n", students.size());
+                    
+                    for(Student student : students){
+                        System.out.printf("-----------------------------\n");
+                        showStudentDetail(student);
+                    }
+                    break;
+                }
+                case 2:{
+                    List<Student> students = studentDAO.getListSortByAvgScore(true);
+                    
+                    System.out.printf("Danh sách SV sắp xếp điểm tăng dần có %d bạn\n", students.size());
+                    
+                    for(Student student : students){
+                        System.out.printf("-----------------------------\n");
+                        showStudentDetail(student);
+                    }
+                    break;
+                }
+                case 3:{
+                    List<Student> students = studentDAO.getListSortByName(false);
+                    
+                    System.out.printf("Danh sách SV sắp xếp họ và tên giảm dần có %d bạn\n", students.size());
+                    
+                    for(Student student : students){
+                        System.out.printf("-----------------------------\n");
+                        showStudentDetail(student);
+                    }
+                    break;
+                }
+                case 4:{
+                    List<Student> students = studentDAO.getListSortByName(true);
+                    
+                    System.out.printf("Danh sách SV sắp xếp họ và tên tăng dần có %d bạn\n", students.size());
+                    
+                    for(Student student : students){
+                        System.out.printf("-----------------------------\n");
+                        showStudentDetail(student);
+                    }
+                    break;
+                }
+                default:
+                    System.out.println("Chọn sai thông tin!");
+                    break;
+            }
+        }catch(Exception e){
+            
+        }
+    }
+    
+    public static void statisticalStudent(){
+        StudentDAO studentDAO = new StudentDAO();
+        Statistical statistical = studentDAO.statistical();
+        System.out.printf("Tổng số sinh viên là: %d\n", statistical.getTotalStudent());
+        System.out.printf("Tổng số sinh viên đạt là: %d\n", statistical.getTotalPass());
+        System.out.printf("Tổng số sinh viên không đạt là: %d\n", statistical.getTotalFail());
+        System.out.printf("Trung bình điểm số của lớp là: %.2f\n", statistical.getAverageClass());
+        System.out.println("SV có điểm TB cao nhất: ");
+        showStudentDetail(statistical.getStudentMaxScore());
+        System.out.println("SV có điểm TB thấp nhất: ");
+        showStudentDetail(statistical.getStudentMinScore());
     }
     
 //  Hàm này sẽ cho người dùng nhập 1 đoạn nội dung
